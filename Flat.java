@@ -1,4 +1,4 @@
-package de.in4matiker.flatscreator;
+package flatscreator;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;

@@ -1,4 +1,4 @@
-package de.in4matiker.flatscreator;
+package flatscreator;
 
 import java.io.File;
 import java.io.FileNotFoundException;

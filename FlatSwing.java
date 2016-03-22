@@ -1,4 +1,4 @@
-package de.in4matiker.flatscreator;
+package flatscreator;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -29,6 +29,9 @@ import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileFilter;
+import java.awt.FileDialog;
+
+
 
 import com.lowagie.text.DocumentException;
 import javax.swing.JCheckBox;
@@ -129,26 +132,16 @@ public class FlatSwing {
 
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					JFileChooser file = new JFileChooser();
-					file.setFileFilter(new FileFilter() {
-
-						@Override
-						public String getDescription() {
-							return "*.PNG";
-						}
-
-						@Override
-						public boolean accept(File f) {
-							return f.isDirectory()
-									|| f.getName().toLowerCase().endsWith(
-											".png");
-						}
-					});
-					if (file.showOpenDialog(jFrame) == JFileChooser.APPROVE_OPTION) {
+				    FileDialog file = new FileDialog(jFrame, "", FileDialog.LOAD);
+				    file.setFile("*.png");
+				    file.setVisible(true);
+				    String fname = file.getDirectory() + 
+					System.getProperty("file.separator") + file.getFile();
+				    if (file.getFile()!=null) {
 						try {
-							flats.add(new Flat(
-									file.getSelectedFile().getAbsolutePath(),
-									doubleFlap.isSelected()));
+						    flats.add(new Flat(
+								       fname,
+								       doubleFlap.isSelected()));
 						} catch (IOException e1) {
 							JOptionPane.showMessageDialog(jFrame,
 									e1.getMessage(), "Error",
@@ -161,7 +154,7 @@ public class FlatSwing {
 							return;
 						}
 						JLabel label = new JLabel(
-								file.getSelectedFile().getName());
+									  file.getFile());
 						files.add(label);
 						label.setAlignmentY(Component.TOP_ALIGNMENT);
 						flatPanel.add(label);
@@ -268,21 +261,21 @@ public class FlatSwing {
 
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					JFileChooser file = new JFileChooser();
-					file.setFileFilter(new FileFilter() {
-						@Override
-						public String getDescription() {
-							return "*.PDF";
-						}
+				    JFileChooser file = new JFileChooser();
+				    file.setFileFilter(new FileFilter() {
+                                                @Override
+						    public String getDescription() {
+						    return "*.PDF";
+                                                }
 
-						@Override
-						public boolean accept(File f) {
-							return f.isDirectory()
-									|| f.getName().toLowerCase().endsWith(
-											".pdf");
-						}
-					});
-					if (file.showSaveDialog(jFrame) == JFileChooser.APPROVE_OPTION) {
+                                                @Override
+						    public boolean accept(File f) {
+						    return f.isDirectory()
+							|| f.getName().toLowerCase().endsWith(
+											      ".pdf");
+                                                }
+                                        });
+				    if (file.showSaveDialog(jFrame) == JFileChooser.APPROVE_OPTION) {
 						try {
 							float bLeft = Float.parseFloat(left.getText().replace(
 									',', '.'));
