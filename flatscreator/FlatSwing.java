@@ -32,7 +32,6 @@ import javax.swing.filechooser.FileFilter;
 import java.awt.FileDialog;
 
 
-
 import com.lowagie.text.DocumentException;
 import javax.swing.JCheckBox;
 
@@ -134,19 +133,20 @@ public class FlatSwing {
 				public void actionPerformed(ActionEvent e) {
 				    FileDialog file = new FileDialog(jFrame, "", FileDialog.LOAD);
 				    file.setFile("*.png");
+				    file.setMultipleMode(true);
 				    file.setVisible(true);
-				    String fname = file.getDirectory() + 
-					System.getProperty("file.separator") + file.getFile();
-				    if (file.getFile()!=null) {
+				    File[] fnames=file.getFiles();
+				    if (fnames.length!=0) {
+					for(int ii=0;ii<fnames.length;ii++){
 						try {
 						    flats.add(new Flat(
-								       fname,
+								       fnames[ii].getAbsolutePath(),
 								       doubleFlap.isSelected()));
 						} catch (IOException e1) {
 							JOptionPane.showMessageDialog(jFrame,
-									e1.getMessage(), "Error",
+										      "Error while reading "+fnames[ii].getName()+": "+e1.getMessage(), "Error",
 									JOptionPane.ERROR_MESSAGE);
-							return;
+							continue;
 						} catch (DocumentException e1) {
 							JOptionPane.showMessageDialog(jFrame,
 									e1.getMessage(), "Error",
@@ -154,7 +154,7 @@ public class FlatSwing {
 							return;
 						}
 						JLabel label = new JLabel(
-									  file.getFile());
+									  fnames[ii].getName());
 						files.add(label);
 						label.setAlignmentY(Component.TOP_ALIGNMENT);
 						flatPanel.add(label);
@@ -196,6 +196,7 @@ public class FlatSwing {
 						flatPanel.add(remove);
 						flatPanel.validate();
 					}
+				    }
 				}
 			});
 		}
@@ -261,7 +262,17 @@ public class FlatSwing {
 
 				@Override
 				public void actionPerformed(ActionEvent e) {
-				    JFileChooser file = new JFileChooser();
+				    //JFileChooser file = new JFileChooser();
+
+				    FileDialog file = new FileDialog(jFrame, "", FileDialog.SAVE);
+                                    //file.setMultipleMode(true);
+                                    //file.setFile("*.png");
+				    file.setFile("*.pdf");
+                                    file.setVisible(true);
+                                    String fname = file.getDirectory() +
+                                        System.getProperty("file.separator") + file.getFile();
+
+				    /*
 				    file.setFileFilter(new FileFilter() {
                                                 @Override
 						    public String getDescription() {
@@ -275,7 +286,9 @@ public class FlatSwing {
 											      ".pdf");
                                                 }
                                         });
-				    if (file.showSaveDialog(jFrame) == JFileChooser.APPROVE_OPTION) {
+file.showSaveDialog(jFrame) == JFileChooser.APPROVE_OPTION
+				    */
+				    if (file.getFile()!=null) {
 						try {
 							float bLeft = Float.parseFloat(left.getText().replace(
 									',', '.'));
@@ -299,7 +312,7 @@ public class FlatSwing {
 								s.addFlat(f);
 
 							}
-							s.output(file.getSelectedFile());
+							s.output(new File(fname));
 						} catch (FileNotFoundException e1) {
 							JOptionPane.showMessageDialog(jFrame,
 									e1.getMessage(), "Error",
