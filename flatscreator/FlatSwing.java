@@ -617,10 +617,10 @@ file.showSaveDialog(jFrame) == JFileChooser.APPROVE_OPTION
 	 * 
 	 * @return javax.swing.JLabel
 	 */
-	private JLabel getAboutVersionLabel() {
+    private JLabel getAboutVersionLabel() {
 		if (aboutVersionLabel == null) {
 			aboutVersionLabel = new JLabel();
-			aboutVersionLabel.setText("<html><center><p>FlatsCreator by zerghase</p><p>Version 1.2</p><p>This program is licensed under the GNU Affero General Public License Version 3</p><p>Source code and licence text are included in the jar file</p><p>Feel free to share it</p><p>http://zerghase.die-informatiker.eu/</p></center></html>");
+			aboutVersionLabel.setText("<html><center><p>FlatsCreator Version 1.3<p>FlatsCreator maintained by pmaanen: https://github.com/pmaanen</p><p>This program is licensed under the GNU Affero General Public License Version 3</p><p>FlatsCreator originally by zerghase: http://zerghase.die-informatiker.eu/</p></center></html>");
 		}
 		return aboutVersionLabel;
 	}
