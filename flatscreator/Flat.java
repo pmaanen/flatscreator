@@ -23,7 +23,7 @@ public class Flat {
 	private float width = 19f * Sheet.MM;
 	private float height = 32f * Sheet.MM;
     	private float imageWidth;
-	private float imageHeigh;
+	private float imageHeight;
 	private float offset = 0;
     private int count = 1;
     private boolean autoSize=true;
@@ -58,6 +58,7 @@ public class Flat {
 		    offset = (imageWidth - image.getScaledWidth()) / 2;
 		}
 		shadow.scaleAbsolute(image.getScaledWidth(), image.getScaledHeight());		
+	    }
 	}
 
     public void draw(PdfContentByte content, float x, float y)

@@ -324,7 +324,7 @@ public class FlatSwing {
 			saveMenuItem.addActionListener(new ActionListener() {
 
 				@Override
-				public void actionPeraformed(ActionEvent e) {
+				public void actionPerformed(ActionEvent e) {
 				    FileDialog file = new FileDialog(jFrame, "", FileDialog.SAVE);
 				    file.setFile("*.flat");
                                     file.setVisible(true);
@@ -514,7 +514,7 @@ public class FlatSwing {
 						f.setDrawShadow(drawShadow.isSelected());
 					}
 				}
-			});
+			    });
 		}
 		return drawShadow;
 	}
@@ -535,10 +535,13 @@ public class FlatSwing {
 						f.setAutoSize(autoSize.isSelected());
 					}
 					height.setEnabled(autoSize.isSelected());
-					    for(JTextField size : sized){
+					    for(JTextField size : sizes){
 						size.setEnabled(autoSize.isSelected());
+					    }
 				}
-			});
+			    });
+			    
+		
 		}
 		return autoSize;
 	}
@@ -714,7 +717,7 @@ public class FlatSwing {
     private JLabel getAboutVersionLabel() {
 		if (aboutVersionLabel == null) {
 			aboutVersionLabel = new JLabel();
-			aboutVersionLabel.setText("<html><center><p>FlatsCreator Version 1.3<p>FlatsCreator maintained by pmaanen: https://github.com/pmaanen</p><p>This program is licensed under the GNU Affero General Public License Version 3</p><p>FlatsCreator originally by zerghase: http://zerghase.die-informatiker.eu/</p></center></html>");
+			aboutVersionLabel.setText("");
 		}
 		return aboutVersionLabel;
 	}
