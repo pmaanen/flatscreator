@@ -22,32 +22,48 @@ public class Flat {
 	private Image shadow;
 	private float width = 19f * Sheet.MM;
 	private float height = 32f * Sheet.MM;
+    	private float imageWidth;
+	private float imageHeigh;
 	private float offset = 0;
-	private int count = 1;
+    private int count = 1;
+    private boolean autoSize=true;
+    private boolean drawShadow=true;
 	private boolean doubleFlap;
 
-	public Flat(String imagePath, boolean doubleFlap) throws IOException,
-			DocumentException {
-		this.doubleFlap = doubleFlap;
+    public Flat(String imagePath, boolean doubleFlap, boolean autoSize) throws IOException,
+									       DocumentException {
+	this.autoSize=autoSize;
+	this.doubleFlap = doubleFlap;
 		image = PngImage.getImage(imagePath);
 		if (image.getImageMask() == null) {
 			throw new IOException("Image has no transparency");
 		}
+		imageWidth = image.getWidth();
+	        imageHeight = image.getHeight();
 		shadow = Image.getInstance(BLACK, null);
 		shadow.setImageMask(image.getImageMask());
 	}
 
 	private void resize() {
+	    if(!autoSize){
 		image.scaleToFit(width, height);
 		if (image.getScaledWidth() < width) {
 			offset = (width - image.getScaledWidth()) / 2;
 		}
 		shadow.scaleAbsolute(image.getScaledWidth(), image.getScaledHeight());
+	    }
+	    else{
+		image.scaleToFit(imageWidth, imageHeight);
+		if (image.getScaledWidth() < imageWidth) {
+		    offset = (imageWidth - image.getScaledWidth()) / 2;
+		}
+		shadow.scaleAbsolute(image.getScaledWidth(), image.getScaledHeight());		
 	}
 
-	public void draw(PdfContentByte content, float x, float y)
+    public void draw(PdfContentByte content, float x, float y)
 			throws DocumentException {
 		resize();
+	      
 		PdfTemplate template = content.createTemplate(width / 3, height);
 		template.beginText();
 		template.setFontAndSize(FONT, FONT_SIZE);
@@ -59,13 +75,17 @@ public class Flat {
 
 		image.setAbsolutePosition(x + width / 3 + offset, y);
 		content.addImage(image);
-		image.setAbsolutePosition(x + width / 3 * 4 + offset, y);
-		content.addImage(image);
-		shadow.setAbsolutePosition(x + width / 3 * 7 + offset, y);
+	
+		Image mirrored=image;
+		mirrored.setAbsolutePosition(x + width / 3 * 7 + offset, y);
+		mirrored.scalePercent(-100,100);
+		content.addImage(mirrored);
+		if(drawShadow){
+		shadow.setAbsolutePosition(x + width / 3 * 10 + offset, y);
 		content.addImage(shadow, -image.getScaledWidth(), 0, 0,
-				image.getScaledHeight(), x + width / 3 * 7 + offset
+				image.getScaledHeight(), x + width / 3 * 10 + offset
 						+ image.getScaledWidth(), y);
-
+		}
 		content.setColorStroke(Color.black);
 		content.saveState();
 		content.rectangle(x, y, width / 3, height);
@@ -87,6 +107,17 @@ public class Flat {
 		doubleFlap = d;
 		resize();
 	}
+    
+    	public void setDrawShadow(boolean d) {
+		drawShadow = d;
+		resize();
+	}
+
+    public void setAutoSize(boolean d) {
+	autoSize = d;
+	resize();
+    }
+
 
 	public void setName(String name) {
 		this.name = name;
@@ -101,6 +132,7 @@ public class Flat {
 	}
 
 	public void setWidth(float width) {
+	    if(!autoSize)
 		this.width = width * Sheet.MM;
 	}
 
@@ -109,8 +141,9 @@ public class Flat {
 	}
 
 	public void setHeight(float height) {
+	    if(!autoSize)
 		this.height = height * Sheet.MM;
-		resize();
+	    resize();
 	}
 
 	public int getCount() {

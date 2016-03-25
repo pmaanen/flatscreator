@@ -1,8 +1,11 @@
 package flatscreator;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,11 +15,10 @@ import com.lowagie.text.PageSize;
 import com.lowagie.text.pdf.PdfContentByte;
 import com.lowagie.text.pdf.PdfWriter;
 
-public class Sheet {
+public class Sheet implements java.io.Serializable {
 	public static final float MM = PageSize.A4.getWidth() / 210f;
 	private List<Flat> flats;
 	private float bLeft, bRight, bBottom, bTop;
-
 	public Sheet(float left, float right, float bottom, float top) {
 		bLeft = left * MM;
 		bRight = right * MM;
@@ -33,7 +35,7 @@ public class Sheet {
 		flats.add(f);
 	}
 
-	public void output(File file) throws FileNotFoundException,
+    public void output(File file) throws FileNotFoundException,
 			DocumentException {
 		Document doc = new Document(PageSize.A4, bLeft, bRight, bTop, bBottom);
 		PdfWriter writer = null;
@@ -62,4 +64,19 @@ public class Sheet {
 
 		doc.close();
 	}
+    public final void writeObject(String fileName) throws IOException {
+	try
+	    {
+		FileOutputStream fileOut =
+		    new FileOutputStream(fileName);
+		ObjectOutputStream out = new ObjectOutputStream(fileOut);
+		out.writeObject(this);
+		out.close();
+		fileOut.close();
+		//System.out.printf("Serialized data is saved in /tmp/employee.ser");
+	    }catch(IOException i)
+	    {
+		i.printStackTrace();
+	    }
+    }
 }

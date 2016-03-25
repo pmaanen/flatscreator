@@ -37,41 +37,42 @@ import javax.swing.JCheckBox;
 
 public class FlatSwing {
 
-	private JFrame jFrame = null; // @jve:decl-index=0:visual-constraint="10,10"
-	private JPanel jContentPane = null;
-	private JMenuBar jJMenuBar = null;
-	private JMenu fileMenu = null;
-	private JMenu helpMenu = null;
-	private JMenuItem exitMenuItem = null;
-	private JMenuItem aboutMenuItem = null;
-	private JDialog aboutDialog = null;
-	private JPanel aboutContentPane = null;
-	private JLabel aboutVersionLabel = null;
-	private JMenuItem newMenuItem = null;
-	private JButton addFlatButton = null;
-	private JScrollPane scrollPane = null;
-	private JPanel flatPanel = null;
-	private JLabel jLabel = null;
-	private JLabel jLabel1 = null;
-	private JLabel jLabel2 = null;
-	private List<Flat> flats = new ArrayList<Flat>();
-	private List<JLabel> files = new ArrayList<JLabel>(); // @jve:decl-index=0:
-	private List<JTextField> names = new ArrayList<JTextField>();
-	private List<JSpinner> counts = new ArrayList<JSpinner>();
-	private List<JTextField> sizes = new ArrayList<JTextField>();
-	private List<JButton> removes = new ArrayList<JButton>();
-	private JLabel jLabel3 = null;
-	private JLabel jLabel4 = null;
-	private JMenuItem jMenuItem = null;
-	private JLabel jLabel5 = null;
-	private JTextField bottom = null;
-	private JPanel jPanel = null;
-	private JLabel jLabel6 = null;
-	private JLabel jLabel7 = null;
-	private JTextField left = null;
-	private JTextField right = null;
-	private JLabel jLabel8 = null;
-
+    private JFrame jFrame = null; // @jve:decl-index=0:visual-constraint="10,10"
+    private JPanel jContentPane = null;
+    private JMenuBar jJMenuBar = null;
+    private JMenu fileMenu = null;
+    private JMenu helpMenu = null;
+    private JMenuItem exitMenuItem = null;
+    private JMenuItem saveMenuItem = null;
+    private JMenuItem aboutMenuItem = null;
+    private JDialog aboutDialog = null;
+    private JPanel aboutContentPane = null;
+    private JLabel aboutVersionLabel = null;
+    private JMenuItem newMenuItem = null;
+    private JButton addFlatButton = null;
+    private JScrollPane scrollPane = null;
+    private JPanel flatPanel = null;
+    private JLabel jLabel = null;
+    private JLabel jLabel1 = null;
+    private JLabel jLabel2 = null;
+    private List<Flat> flats = new ArrayList<Flat>();
+    private List<JLabel> files = new ArrayList<JLabel>(); // @jve:decl-index=0:
+    private List<JTextField> names = new ArrayList<JTextField>();
+    private List<JSpinner> counts = new ArrayList<JSpinner>();
+    private List<JTextField> sizes = new ArrayList<JTextField>();
+    private List<JButton> removes = new ArrayList<JButton>();
+    private JLabel jLabel3 = null;
+    private JLabel jLabel4 = null;
+    private JMenuItem exportMenuItem = null;
+    private JLabel jLabel5 = null;
+    private JTextField bottom = null;
+    private JPanel jPanel = null;
+    private JLabel jLabel6 = null;
+    private JLabel jLabel7 = null;
+    private JTextField left = null;
+    private JTextField right = null;
+    private JLabel jLabel8 = null;
+    
 	/**
 	 * This method initializes newMenuItem
 	 * 
@@ -141,7 +142,7 @@ public class FlatSwing {
 						try {
 						    flats.add(new Flat(
 								       fnames[ii].getAbsolutePath(),
-								       doubleFlap.isSelected()));
+								       doubleFlap.isSelected(), drawShadow.isSelected()));
 						} catch (IOException e1) {
 							JOptionPane.showMessageDialog(jFrame,
 										      "Error while reading "+fnames[ii].getName()+": "+e1.getMessage(), "Error",
@@ -250,44 +251,23 @@ public class FlatSwing {
 	}
 
 	/**
-	 * This method initializes jMenuItem
+	 * This method initializes the export menu item
 	 * 
 	 * @return javax.swing.JMenuItem
 	 */
-	private JMenuItem getJMenuItem() {
-		if (jMenuItem == null) {
-			jMenuItem = new JMenuItem();
-			jMenuItem.setText("Export...");
-			jMenuItem.addActionListener(new ActionListener() {
+	private JMenuItem getExportMenuItem() {
+		if (exportMenuItem == null) {
+			exportMenuItem = new JMenuItem();
+			exportMenuItem.setText("Export...");
+			exportMenuItem.addActionListener(new ActionListener() {
 
 				@Override
 				public void actionPerformed(ActionEvent e) {
-				    //JFileChooser file = new JFileChooser();
-
 				    FileDialog file = new FileDialog(jFrame, "", FileDialog.SAVE);
-                                    //file.setMultipleMode(true);
-                                    //file.setFile("*.png");
 				    file.setFile("*.pdf");
                                     file.setVisible(true);
                                     String fname = file.getDirectory() +
                                         System.getProperty("file.separator") + file.getFile();
-
-				    /*
-				    file.setFileFilter(new FileFilter() {
-                                                @Override
-						    public String getDescription() {
-						    return "*.PDF";
-                                                }
-
-                                                @Override
-						    public boolean accept(File f) {
-						    return f.isDirectory()
-							|| f.getName().toLowerCase().endsWith(
-											      ".pdf");
-                                                }
-                                        });
-file.showSaveDialog(jFrame) == JFileChooser.APPROVE_OPTION
-				    */
 				    if (file.getFile()!=null) {
 						try {
 							float bLeft = Float.parseFloat(left.getText().replace(
@@ -330,9 +310,74 @@ file.showSaveDialog(jFrame) == JFileChooser.APPROVE_OPTION
 				}
 			});
 		}
-		return jMenuItem;
+		return exportMenuItem;
 	}
+	/**
+	 * This method initializes the save button
+	 * 
+	 * @return javax.swing.JMenuItem
+	 */
+	private JMenuItem getSaveMenuItem() {
+		if (saveMenuItem == null) {
+			saveMenuItem = new JMenuItem();
+			saveMenuItem.setText("Save...");
+			saveMenuItem.addActionListener(new ActionListener() {
 
+				@Override
+				public void actionPeraformed(ActionEvent e) {
+				    FileDialog file = new FileDialog(jFrame, "", FileDialog.SAVE);
+				    file.setFile("*.flat");
+                                    file.setVisible(true);
+                                    String fname = file.getDirectory() +
+                                        System.getProperty("file.separator") + file.getFile();
+				    if (file.getFile()!=null) {
+						try {
+							float bLeft = Float.parseFloat(left.getText().replace(
+									',', '.'));
+							float bRight = Float.parseFloat(right.getText().replace(
+									',', '.'));
+							float bBottom = Float.parseFloat(bottom.getText().replace(
+									',', '.'));
+							float bTop = Float.parseFloat(top.getText().replace(
+									',', '.'));
+							Sheet s = new Sheet(bLeft, bRight, bBottom, bTop);
+							Iterator<JTextField> namesIter = names.iterator();
+							Iterator<JSpinner> countsIter = counts.iterator();
+							Iterator<JTextField> sizesIter = sizes.iterator();
+							for (Flat f : flats) {
+								f.setName(namesIter.next().getText());
+								f.setCount((Integer) countsIter.next().getValue());
+								f.setWidth(Float.parseFloat(sizesIter.next().getText().replace(
+										',', '.')));
+								f.setHeight(Float.parseFloat(height.getText().replace(
+										',', '.')));
+								s.addFlat(f);
+
+							}
+							
+							s.writeObject(fname);
+
+							
+						} catch (FileNotFoundException e1) {
+							JOptionPane.showMessageDialog(jFrame,
+									e1.getMessage(), "Error",
+									JOptionPane.ERROR_MESSAGE);
+						} catch (IOException e1) {
+							JOptionPane.showMessageDialog(jFrame,
+									e1.getMessage(), "Error",
+									JOptionPane.ERROR_MESSAGE);
+						} catch (NumberFormatException e1) {
+							JOptionPane.showMessageDialog(jFrame,
+									e1.getMessage(), "Error",
+									JOptionPane.ERROR_MESSAGE);
+						}
+					}
+				}
+			});
+		}
+		return saveMenuItem;
+	}
+    
 	/**
 	 * This method initializes bottom
 	 * 
@@ -367,7 +412,9 @@ file.showSaveDialog(jFrame) == JFileChooser.APPROVE_OPTION
 
 	private JLabel jLabel9;
 	private JLabel jLabel10;
-	private JCheckBox doubleFlap = null;
+    private JCheckBox doubleFlap = null;
+    private JCheckBox drawShadow = null;
+    private JCheckBox autoSize = null;
 	/**
 	 * This method initializes jPanel
 	 * 
@@ -398,7 +445,8 @@ file.showSaveDialog(jFrame) == JFileChooser.APPROVE_OPTION
 			jPanel.add(jLabel10, null);
 			jPanel.add(getHeight(), null);
 			jPanel.add(jLabel8, null);
-
+			jPanel.add(getDrawShadow(),null);
+			jPanel.add(getAutoSize(),null);
 			jPanel.add(getDoubleFlap(), null);
 		}
 		return jPanel;
@@ -449,6 +497,50 @@ file.showSaveDialog(jFrame) == JFileChooser.APPROVE_OPTION
 			});
 		}
 		return doubleFlap;
+	}
+    	/**
+	 * This method initializes drawShadow
+	 * 
+	 * @return javax.swing.JCheckBox
+	 */
+	private JCheckBox getDrawShadow() {
+		if (drawShadow == null) {
+			drawShadow = new JCheckBox();
+			drawShadow.setText("draw shadow");
+			drawShadow.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					for (Flat f : flats) {
+						f.setDrawShadow(drawShadow.isSelected());
+					}
+				}
+			});
+		}
+		return drawShadow;
+	}
+
+        	/**
+	 * This method initializes autoSize
+	 * 
+	 * @return javax.swing.JCheckBox
+	 */
+	private JCheckBox getAutoSize() {
+		if (autoSize == null) {
+			autoSize = new JCheckBox();
+			autoSize.setText("auto size");
+			autoSize.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					for (Flat f : flats) {
+						f.setAutoSize(autoSize.isSelected());
+					}
+					height.setEnabled(autoSize.isSelected());
+					    for(JTextField size : sized){
+						size.setEnabled(autoSize.isSelected());
+				}
+			});
+		}
+		return autoSize;
 	}
 
 	/**
@@ -522,7 +614,9 @@ file.showSaveDialog(jFrame) == JFileChooser.APPROVE_OPTION
 			fileMenu = new JMenu();
 			fileMenu.setText("File");
 			fileMenu.add(getNewMenuItem());
-			fileMenu.add(getJMenuItem());
+			fileMenu.add(getExportMenuItem());
+			//Now implemented
+			//fileMenu.add(getSaveMenuItem());
 			fileMenu.add(getExitMenuItem());
 		}
 		return fileMenu;
