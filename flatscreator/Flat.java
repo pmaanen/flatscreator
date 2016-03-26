@@ -41,10 +41,6 @@ public class Flat implements java.io.Serializable {
 	this.autoSize=autoSize;
 	this.drawShadow=drawShadow;
 	this.doubleFlap = doubleFlap;
-	if(autoSize){
-	    width=imageWidth;
-	    height=imageHeight;
-	}
 	this.imagePath=imagePath;
 	initialize();
     }
@@ -59,8 +55,13 @@ public class Flat implements java.io.Serializable {
         shadow.setImageMask(image.getImageMask());
         mirrored=PngImage.getImage(imagePath);
         mirrored.scalePercent(-100,100);
-	imageWidth = image.getWidth();
-        imageHeight = image.getHeight();
+	imageWidth = image.getPlainWidth()/image.getDpiX()*25.4f*Sheet.MM;
+        imageHeight = image.getPlainHeight()/image.getDpiY()*25.4f*Sheet.MM;
+	if(autoSize){
+            width=imageWidth;
+	    height=imageHeight;
+        }
+	System.out.printf(imagePath+" width: "+imageWidth+" height: "+imageHeight);   
 	FONT = BaseFont.createFont(BaseFont.HELVETICA, "Cp1252",false);
     }
     
@@ -71,6 +72,7 @@ public class Flat implements java.io.Serializable {
 	    width=imageWidth;
 	    height=imageHeight;
 	}
+
 	image.scaleToFit(width, height);
 	mirrored.scaleAbsolute(-image.getScaledWidth(), image.getScaledHeight());
 	if (image.getScaledWidth() < width) {
@@ -100,9 +102,7 @@ public class Flat implements java.io.Serializable {
 	content.addImage(mirrored);
 	if(drawShadow){
 	    shadow.setAbsolutePosition(x + width / 3 * 7 + offset, y);
-	    content.addImage(shadow, -image.getScaledWidth(), 0, 0,
-			     image.getScaledHeight(), x + width / 3 * 7 + offset
-			     + image.getScaledWidth(), y);
+	    content.addImage(shadow);
 	}
 	content.setColorStroke(Color.black);
 	content.saveState();
@@ -188,32 +188,3 @@ public class Flat implements java.io.Serializable {
     }    
        
 }
-/*
-public class SerializableFlat implements java.io.Serializable {
-    public String name = "";
-    public float width = 19f * Sheet.MM;
-    public float height = 32f * Sheet.MM;
-    public float imageWidth;
-    public float imageHeight;
-    public float offset = 0;
-    public int count = 1;
-    public boolean autoSize;
-    public boolean drawShadow;
-    public boolean doubleFlap;
-    public String filename="";
-    public SerializableFlat(Flat flat){
-	System.out.printf("Creating SerializableFlat");
-	this.name=flat.name;
-	this.autoSize=flat.autoSize;
-	this.drawShadow=flat.drawShadow;
-	this.doubleFlap = flat.doubleFlap;
-	this.imageWidth=flat.imageWidth;
-	this.imageHeight=flat.imageHeight;
-	this.offset=flat.offset;
-	this.width=flat.width;
-	this.height=flat.height;
-	this.count=flat.count;
-	this.filename = flat.filename;
-    }
-}
-*/
