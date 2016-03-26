@@ -16,7 +16,7 @@ import com.lowagie.text.pdf.PdfContentByte;
 import com.lowagie.text.pdf.PdfWriter;
 
 public class Sheet implements java.io.Serializable {
-    private static long serialVersionUID = 1L;
+    private static long serialVersionUID = 2L;
     public static final float MM = PageSize.A4.getWidth() / 210f;
     private List<Flat> flats;
     private float bLeft, bRight, bBottom, bTop;
@@ -38,6 +38,10 @@ public class Sheet implements java.io.Serializable {
 	}
     }
     */
+    public float getBLeft(){return bLeft/MM;}
+    public float getBRight(){return bRight/MM;}
+    public float getBBottom(){return bBottom/MM;}
+    public float getBTop(){return bTop/MM;}
     
     public void initializeFlats() throws  IOException,DocumentException {
 	for (Flat iFlat: flats){
@@ -45,6 +49,10 @@ public class Sheet implements java.io.Serializable {
 	}
     }
     
+    public List<Flat> getFlats(){
+	return flats;
+    }
+
     public Flat getFlat(int i) {
 	return flats.get(i);
     }

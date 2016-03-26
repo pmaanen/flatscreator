@@ -13,7 +13,7 @@ import com.lowagie.text.pdf.codec.PngImage;
 import java.io.Serializable;
 
 public class Flat implements java.io.Serializable {
-    private static long serialVersionUID = 1L;
+    private static long serialVersionUID = 2L;
     transient public static final BufferedImage BLACK = new BufferedImage(1, 1,
 								 BufferedImage.TYPE_INT_ARGB);
     public static final int FONT_SIZE = 12;
@@ -24,8 +24,8 @@ public class Flat implements java.io.Serializable {
     transient public Image image;
     transient public Image mirrored;
     transient public Image shadow;
-    public float oldWidth = 19f * Sheet.MM;
-    public float oldHeight = 32f * Sheet.MM;
+    public float oldWidth = 0;
+    public float oldHeight = 0;
     public float width = 19f * Sheet.MM;
     public float height = 32f * Sheet.MM;
     public float imageWidth;
@@ -61,11 +61,14 @@ public class Flat implements java.io.Serializable {
             width=imageWidth;
 	    height=imageHeight;
         }
-	System.out.printf(imagePath+" width: "+imageWidth+" height: "+imageHeight);   
 	FONT = BaseFont.createFont(BaseFont.HELVETICA, "Cp1252",false);
     }
     
-
+    public String getImagePath(){
+	return imagePath;
+    }
+    
+    
     
     public void resize() {
 	if(autoSize){
@@ -126,9 +129,17 @@ public class Flat implements java.io.Serializable {
 	resize();
     }
     
+    public boolean getDoubleFlap(){
+	return doubleFlap;
+    }
+    
     public void setDrawShadow(boolean d) {
 	drawShadow = d;
 	resize();
+    }
+    
+    public boolean getDrawShadow(){
+	return drawShadow;
     }
     
     public void setAutoSize(boolean d) {
@@ -146,6 +157,10 @@ public class Flat implements java.io.Serializable {
 	resize();
     }
     
+    public boolean getAutoSize(){
+	return autoSize;
+    }
+    
     
     public void setName(String name) {
 	this.name = name;
@@ -159,6 +174,13 @@ public class Flat implements java.io.Serializable {
 	return width / 3f * multi;
     }
     
+    public float getWidthInMM(){
+	if(oldWidth==0)
+	    return width/Sheet.MM;
+	else
+	    return oldWidth/Sheet.MM;
+    }
+    
     public void setWidth(float width) {
 	if(!autoSize)
 	    this.width = width * Sheet.MM;
@@ -169,6 +191,13 @@ public class Flat implements java.io.Serializable {
     
     public float getHeight() {
 	return height;
+    }
+    
+    public float getHeightInMM(){
+	if(oldHeight==0)
+	    return height/Sheet.MM;
+	else
+	    return oldHeight/Sheet.MM;
     }
     
     public void setHeight(float height) {

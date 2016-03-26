@@ -80,12 +80,37 @@ public class FlatSwing {
     private JTextField right = null;
     private JLabel jLabel8 = null;
     
-	/**
-	 * This method initializes newMenuItem
-	 * 
-	 * @return javax.swing.JMenuItem
-	 */
-	private JMenuItem getNewMenuItem() {
+    /**
+     * This method initializes newMenuItem
+     * 
+     * @return javax.swing.JMenuItem
+     */
+    
+    private void newSheet(){
+	for (JLabel f : files) {
+	    flatPanel.remove(f);
+	}
+	for (JTextField t : names) {
+	    flatPanel.remove(t);
+	}
+	for (JSpinner s : counts) {
+	    flatPanel.remove(s);
+	}
+	for (JTextField t : sizes) {
+	    flatPanel.remove(t);
+	}
+	for (JButton b : removes) {
+	    flatPanel.remove(b);
+	}
+	flats = new ArrayList<Flat>();
+	files = new ArrayList<JLabel>();
+	names = new ArrayList<JTextField>();
+	counts = new ArrayList<JSpinner>();
+	sizes = new ArrayList<JTextField>();
+	removes = new ArrayList<JButton>();
+	flatPanel.validate();
+    }
+    private JMenuItem getNewMenuItem() {
 		if (newMenuItem == null) {
 			newMenuItem = new JMenuItem();
 			newMenuItem.setText("New...");
@@ -97,40 +122,133 @@ public class FlatSwing {
 							"All changes will be lost.", "New...",
 							JOptionPane.WARNING_MESSAGE);
 					if (r == JOptionPane.OK_OPTION) {
-						for (JLabel f : files) {
-							flatPanel.remove(f);
-						}
-						for (JTextField t : names) {
-							flatPanel.remove(t);
-						}
-						for (JSpinner s : counts) {
-							flatPanel.remove(s);
-						}
-						for (JTextField t : sizes) {
-							flatPanel.remove(t);
-						}
-						for (JButton b : removes) {
-							flatPanel.remove(b);
-						}
-						flats = new ArrayList<Flat>();
-						files = new ArrayList<JLabel>();
-						names = new ArrayList<JTextField>();
-						counts = new ArrayList<JSpinner>();
-						sizes = new ArrayList<JTextField>();
-						removes = new ArrayList<JButton>();
-						flatPanel.validate();
+					    newSheet();
 					}
 				}
-			});
+			    });
 		}
 		return newMenuItem;
-	}
+    }
 
 	/**
 	 * This method initializes addFlatButton
 	 * 
 	 * @return javax.swing.JButton
 	 */
+    private void addFlat(Flat[] xFlats){
+	for(Flat iFlat: xFlats){
+	    this.flats.add(iFlat);
+	    JLabel label = new JLabel(iFlat.getImagePath().split("/")[iFlat.getImagePath().split("/").length-1]);
+            files.add(label);
+            label.setAlignmentY(Component.TOP_ALIGNMENT);
+            flatPanel.add(label);
+            JTextField text = new JTextField();
+	    text.setText(iFlat.getName());
+            text.setAlignmentY(Component.TOP_ALIGNMENT);
+            names.add(text);
+            flatPanel.add(text);
+            text = new JTextField();
+            text.setAlignmentY(Component.TOP_ALIGNMENT);
+            text.setText(Float.toString(iFlat.getWidthInMM()));
+            text.setEnabled(!autoSize.isEnabled());
+            sizes.add(text);
+            flatPanel.add(text);
+            JSpinner spinner = new JSpinner();
+            spinner.setAlignmentY(Component.TOP_ALIGNMENT);
+            spinner.setValue(iFlat.getCount());
+            counts.add(spinner);
+            flatPanel.add(spinner);
+            JButton remove = new JButton("Remove");
+            remove.setAlignmentY(Component.TOP_ALIGNMENT);
+            remove.addActionListener(new ActionListener() {
+                    @Override
+                        public void actionPerformed(ActionEvent event) {
+                        int id = removes.indexOf(event.getSource());
+                        flats.remove(id);
+                        flatPanel.remove(files.get(id));
+                        files.remove(id);
+                        flatPanel.remove(counts.get(id));
+                        counts.remove(id);
+                        flatPanel.remove(sizes.get(id));
+                        sizes.remove(id);
+                        flatPanel.remove(names.get(id));
+                        names.remove(id);
+                        flatPanel.remove(removes.get(id));
+                        removes.remove(id);
+                        flatPanel.validate();
+                    }
+                });
+            removes.add(remove);
+            flatPanel.add(remove);
+            flatPanel.validate();
+        }
+	
+
+
+    }
+    private void addFlat(File [] fnames){
+	for(int ii=0;ii<fnames.length;ii++){
+	    try {
+		flats.add(new Flat(
+				   fnames[ii].getAbsolutePath(),
+				   doubleFlap.isSelected(), autoSize.isSelected(), drawShadow.isSelected()));
+	    } catch (IOException e1) {
+		JOptionPane.showMessageDialog(jFrame,
+					      "Error while reading "+fnames[ii].getName()+": "+e1.getMessage(), "Error",
+					      JOptionPane.ERROR_MESSAGE);
+		continue;
+	    } catch (DocumentException e1) {
+		JOptionPane.showMessageDialog(jFrame,
+					      e1.getMessage(), "Error",
+					      JOptionPane.ERROR_MESSAGE);
+		return;
+	    }
+	    JLabel label = new JLabel(
+				      fnames[ii].getName());
+	    files.add(label);
+	    label.setAlignmentY(Component.TOP_ALIGNMENT);
+	    flatPanel.add(label);
+	    JTextField text = new JTextField();
+	    text.setAlignmentY(Component.TOP_ALIGNMENT);
+	    names.add(text);
+	    flatPanel.add(text);
+	    text = new JTextField();
+	    text.setAlignmentY(Component.TOP_ALIGNMENT);
+	    text.setText("19");
+	    text.setEnabled(!autoSize.isEnabled());
+	    sizes.add(text);
+	    flatPanel.add(text);
+	    JSpinner spinner = new JSpinner();
+	    spinner.setAlignmentY(Component.TOP_ALIGNMENT);
+	    spinner.setValue(1);
+	    counts.add(spinner);
+	    flatPanel.add(spinner);
+	    JButton remove = new JButton("Remove");
+	    remove.setAlignmentY(Component.TOP_ALIGNMENT);
+	    remove.addActionListener(new ActionListener() {
+		    @Override
+			public void actionPerformed(ActionEvent event) {
+			int id = removes.indexOf(event.getSource());
+			flats.remove(id);
+			flatPanel.remove(files.get(id));
+			files.remove(id);
+			flatPanel.remove(counts.get(id));
+			counts.remove(id);
+			flatPanel.remove(sizes.get(id));
+			sizes.remove(id);
+			flatPanel.remove(names.get(id));
+			names.remove(id);
+			flatPanel.remove(removes.get(id));
+			removes.remove(id);
+			flatPanel.validate();
+		    }
+		});
+	    removes.add(remove);
+	    flatPanel.add(remove);
+	    flatPanel.validate();
+	}
+    }
+
 	private JButton getAddFlatButton() {
 		if (addFlatButton == null) {
 			addFlatButton = new JButton();
@@ -145,69 +263,12 @@ public class FlatSwing {
 				    file.setVisible(true);
 				    File[] fnames=file.getFiles();
 				    if (fnames.length!=0) {
-					for(int ii=0;ii<fnames.length;ii++){
-						try {
-						    flats.add(new Flat(
-								       fnames[ii].getAbsolutePath(),
-								       doubleFlap.isSelected(), autoSize.isSelected(), drawShadow.isSelected()));
-						} catch (IOException e1) {
-							JOptionPane.showMessageDialog(jFrame,
-										      "Error while reading "+fnames[ii].getName()+": "+e1.getMessage(), "Error",
-									JOptionPane.ERROR_MESSAGE);
-							continue;
-						} catch (DocumentException e1) {
-							JOptionPane.showMessageDialog(jFrame,
-									e1.getMessage(), "Error",
-									JOptionPane.ERROR_MESSAGE);
-							return;
-						}
-						JLabel label = new JLabel(
-									  fnames[ii].getName());
-						files.add(label);
-						label.setAlignmentY(Component.TOP_ALIGNMENT);
-						flatPanel.add(label);
-						JTextField text = new JTextField();
-						text.setAlignmentY(Component.TOP_ALIGNMENT);
-						names.add(text);
-						flatPanel.add(text);
-						text = new JTextField();
-						text.setAlignmentY(Component.TOP_ALIGNMENT);
-						text.setText("19");
-						text.setEnabled(!autoSize.isEnabled());
-						sizes.add(text);
-						flatPanel.add(text);
-						JSpinner spinner = new JSpinner();
-						spinner.setAlignmentY(Component.TOP_ALIGNMENT);
-						spinner.setValue(1);
-						counts.add(spinner);
-						flatPanel.add(spinner);
-						JButton remove = new JButton("Remove");
-						remove.setAlignmentY(Component.TOP_ALIGNMENT);
-						remove.addActionListener(new ActionListener() {
-							@Override
-							public void actionPerformed(ActionEvent event) {
-								int id = removes.indexOf(event.getSource());
-								flats.remove(id);
-								flatPanel.remove(files.get(id));
-								files.remove(id);
-								flatPanel.remove(counts.get(id));
-								counts.remove(id);
-								flatPanel.remove(sizes.get(id));
-								sizes.remove(id);
-								flatPanel.remove(names.get(id));
-								names.remove(id);
-								flatPanel.remove(removes.get(id));
-								removes.remove(id);
-								flatPanel.validate();
-							}
-						});
-						removes.add(remove);
-						flatPanel.add(remove);
-						flatPanel.validate();
-					}
+					addFlat(fnames);
+					
 				    }
+				
 				}
-			});
+			    });
 		}
 		return addFlatButton;
 	}
@@ -763,7 +824,7 @@ public class FlatSwing {
 	Sheet e = null;
       try
 	  {
-	      FileInputStream fileIn = new FileInputStream("/Users/pmaanen/Desktop/brawler.flat");
+	      FileInputStream fileIn = new FileInputStream(filename);
 	      ObjectInputStream in = new ObjectInputStream(fileIn);
 
 	      try{
@@ -778,36 +839,25 @@ public class FlatSwing {
 	      }
 	      in.close();
 	      fileIn.close();
-
-	      FileDialog file = new FileDialog(jFrame, "", FileDialog.SAVE);
-	      file.setFile("*.pdf");
-	      file.setVisible(true);
-	      String fname = file.getDirectory() +
-		  System.getProperty("file.separator") + file.getFile();
-	      if (file.getFile()!=null) {
-		  try {
-		      e.output(new File(fname));
-		  } catch (FileNotFoundException e1) {
-		      JOptionPane.showMessageDialog(jFrame,
-						    e1.getMessage(), "Error",
-						    JOptionPane.ERROR_MESSAGE);
-		  } catch (DocumentException e1) {
-		      JOptionPane.showMessageDialog(jFrame,
-						    e1.getMessage(), "Error",
-						    JOptionPane.ERROR_MESSAGE);
-		  } catch (NumberFormatException e1) {
-		      JOptionPane.showMessageDialog(jFrame,
-						    e1.getMessage(), "Error",
-						    JOptionPane.ERROR_MESSAGE);
-		  }
-	      }
+	      
+	      newSheet();
+	      
+	      Flat [] flats=new Flat[e.getFlats().size()];
+	      flats=e.getFlats().toArray(flats);
+	      addFlat(flats);
+	      autoSize.setSelected(e.getFlat(0).getAutoSize());
+	      doubleFlap.setSelected(e.getFlat(0).getDoubleFlap());
+	      drawShadow.setSelected(e.getFlat(0).getDrawShadow());
+	      bottom.setText(Float.toString(e.getBBottom()));
+	      height.setText(Float.toString(e.getFlat(0).getHeightInMM()));
+	      
 	  } catch(IOException i) {
 	  i.printStackTrace();
 	  return;
       } catch(DocumentException d){
 	  d.printStackTrace();
 	  return;
-      } 
+      }
       catch(ClassNotFoundException c){
 	  System.out.println("Sheet class not found");
 	  c.printStackTrace();
