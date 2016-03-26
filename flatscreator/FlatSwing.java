@@ -334,13 +334,9 @@ public class FlatSwing {
 			public void actionPerformed(ActionEvent e) {
 			FileDialog file = new FileDialog(jFrame, "", FileDialog.LOAD);
 			file.setFile("*.flat");
-			file.setMultipleMode(true);
 			file.setVisible(true);
-			File[] fnames=file.getFiles();
-			if (fnames.length!=0) {
-			    for (File filename : fnames){
-				readSheet(filename.getPath());
-			    }
+			if (file.getFile()!=null) {
+				readSheet(file.getDirectory()+ System.getProperty("file.separator") + file.getFile());
 			}
 		    }});
 	}
@@ -388,8 +384,13 @@ public class FlatSwing {
 								s.addFlat(f);
 
 							}
-							
-							s.writeObject(fname);
+							FileOutputStream fileOut =new FileOutputStream(fname);
+							ObjectOutputStream out = new ObjectOutputStream(fileOut);
+							out.writeObject(s);
+							out.close();
+							fileOut.close();
+							//System.out.printf("Serialized data is saved in /tmp/employee.ser");
+							//s.writeObject(fname);
 
 							
 						} catch (FileNotFoundException e1) {
@@ -550,6 +551,7 @@ public class FlatSwing {
 				}
 			    });
 		}
+		drawShadow.setSelected (true);
 		return drawShadow;
 	}
 
@@ -761,9 +763,19 @@ public class FlatSwing {
 	Sheet e = null;
       try
 	  {
-	      FileInputStream fileIn = new FileInputStream(filename);
+	      FileInputStream fileIn = new FileInputStream("/Users/pmaanen/Desktop/brawler.flat");
 	      ObjectInputStream in = new ObjectInputStream(fileIn);
-	      e =new Sheet( (Sheet) in.readObject() );
+
+	      try{
+		  e =(Sheet)in.readObject();
+		  e.initializeFlats();
+	      }
+	      catch (NullPointerException n){
+		  System.out.println("Could not read "+filename);
+		  in.close();
+		  fileIn.close();
+		  return;
+	      }
 	      in.close();
 	      fileIn.close();
 

@@ -13,7 +13,7 @@ import com.lowagie.text.pdf.codec.PngImage;
 import java.io.Serializable;
 
 public class Flat implements java.io.Serializable {
-    
+    private static long serialVersionUID = 1L;
     transient public static final BufferedImage BLACK = new BufferedImage(1, 1,
 								 BufferedImage.TYPE_INT_ARGB);
     public static final int FONT_SIZE = 12;
@@ -24,6 +24,8 @@ public class Flat implements java.io.Serializable {
     transient public Image image;
     transient public Image mirrored;
     transient public Image shadow;
+    public float oldWidth = 19f * Sheet.MM;
+    public float oldHeight = 32f * Sheet.MM;
     public float width = 19f * Sheet.MM;
     public float height = 32f * Sheet.MM;
     public float imageWidth;
@@ -34,50 +36,43 @@ public class Flat implements java.io.Serializable {
     public boolean drawShadow;
     public boolean doubleFlap;
     
-    public Flat(Flat flat) throws IOException,DocumentException{
-	this.autoSize=flat.autoSize;
-        this.drawShadow=flat.drawShadow;
-        this.doubleFlap = flat.doubleFlap;
-        image = PngImage.getImage(flat.imagePath);
-        if (image.getImageMask() == null) {
-            throw new IOException("Image has no transparency");
-        }
-        imageWidth = flat.imageWidth;
-        imageHeight = flat.imageHeight;
-        this.width=flat.width;
-	this.height=flat.height;
-        this.imagePath=flat.imagePath;
-        shadow = Image.getInstance(BLACK, null);
-        shadow.setImageMask(image.getImageMask());
-        mirrored=image;
-        mirrored.scalePercent(-100,100);
-    }
-    
     public Flat(String imagePath, boolean doubleFlap, boolean autoSize, boolean drawShadow) throws IOException,
 												   DocumentException {
 	this.autoSize=autoSize;
 	this.drawShadow=drawShadow;
 	this.doubleFlap = doubleFlap;
-	image = PngImage.getImage(imagePath);
-	if (image.getImageMask() == null) {
-	    throw new IOException("Image has no transparency");
-	}
-	imageWidth = image.getWidth();
-	imageHeight = image.getHeight();
 	if(autoSize){
 	    width=imageWidth;
 	    height=imageHeight;
 	}
 	this.imagePath=imagePath;
-	shadow = Image.getInstance(BLACK, null);
-	shadow.setImageMask(image.getImageMask());
-	mirrored=image;
-	mirrored.scalePercent(-100,100);
+	initialize();
     }
     
+    public void initialize() throws IOException, 
+				    DocumentException {
+	image = PngImage.getImage(imagePath);
+        if (image.getImageMask() == null) {
+            throw new IOException("Image has no transparency");
+        }
+	shadow = Image.getInstance(BLACK, null);
+        shadow.setImageMask(image.getImageMask());
+        mirrored=PngImage.getImage(imagePath);
+        mirrored.scalePercent(-100,100);
+	imageWidth = image.getWidth();
+        imageHeight = image.getHeight();
+	FONT = BaseFont.createFont(BaseFont.HELVETICA, "Cp1252",false);
+    }
+    
+
+    
     public void resize() {
+	if(autoSize){
+	    width=imageWidth;
+	    height=imageHeight;
+	}
 	image.scaleToFit(width, height);
-	mirrored.scaleToFit(width,height);
+	mirrored.scaleAbsolute(-image.getScaledWidth(), image.getScaledHeight());
 	if (image.getScaledWidth() < width) {
 	    offset = (width - image.getScaledWidth()) / 2;
 	}
@@ -100,9 +95,8 @@ public class Flat implements java.io.Serializable {
 	image.setAbsolutePosition(x + width / 3 + offset, y);
 	content.addImage(image);
 	
-	image.setAbsolutePosition(x + width / 3 * 4 + offset, y);
-	mirrored.setAbsolutePosition(x + width / 3 * 4 + offset, y);
-	mirrored.scalePercent(-100,100);
+	//image.setAbsolutePosition(x + width / 3 * 4 + offset, y);
+	mirrored.setAbsolutePosition(x + width / 3 * 7 + offset, y);
 	content.addImage(mirrored);
 	if(drawShadow){
 	    shadow.setAbsolutePosition(x + width / 3 * 7 + offset, y);
@@ -139,6 +133,16 @@ public class Flat implements java.io.Serializable {
     
     public void setAutoSize(boolean d) {
 	autoSize = d;
+	if(autoSize){
+	    oldWidth=width;
+	    oldHeight=height;
+	    width=imageWidth;
+	    height=imageHeight;
+	}
+	else{
+	    width=oldWidth;
+	    height=oldHeight;
+	}
 	resize();
     }
     
