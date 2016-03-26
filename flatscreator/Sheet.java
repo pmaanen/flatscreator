@@ -16,29 +16,40 @@ import com.lowagie.text.pdf.PdfContentByte;
 import com.lowagie.text.pdf.PdfWriter;
 
 public class Sheet implements java.io.Serializable {
-	public static final float MM = PageSize.A4.getWidth() / 210f;
-	private List<Flat> flats;
-	private float bLeft, bRight, bBottom, bTop;
-	public Sheet(float left, float right, float bottom, float top) {
-		bLeft = left * MM;
-		bRight = right * MM;
-		bBottom = bottom * MM;
-		bTop = top * MM;
-		flats = new ArrayList<Flat>();
+    
+    public static final float MM = PageSize.A4.getWidth() / 210f;
+    private List<Flat> flats;
+    private float bLeft, bRight, bBottom, bTop;
+    public Sheet(float left, float right, float bottom, float top) {
+	bLeft = left * MM;
+	bRight = right * MM;
+	bBottom = bottom * MM;
+	bTop = top * MM;
+	flats = new ArrayList<Flat>();
+    }
+    
+    public Sheet(Sheet sheet) throws  IOException,DocumentException{
+	this.bLeft = sheet.bLeft;
+	this.bRight = sheet.bRight;
+	this.bBottom = sheet.bBottom;
+	this.bTop = sheet.bBottom;
+	for( Flat iFlat : sheet.flats){
+	    this.flats.add(new Flat(iFlat));
 	}
-
-	public Flat getFlat(int i) {
-		return flats.get(i);
-	}
-
-	public void addFlat(Flat f) {
-		flats.add(f);
-	}
-
+    }
+    
+    public Flat getFlat(int i) {
+	return flats.get(i);
+    }
+    
+    public void addFlat(Flat f) {
+	flats.add(f);
+    }
+    
     public void output(File file) throws FileNotFoundException,
-			DocumentException {
-		Document doc = new Document(PageSize.A4, bLeft, bRight, bTop, bBottom);
-		PdfWriter writer = null;
+					 DocumentException {
+	Document doc = new Document(PageSize.A4, bLeft, bRight, bTop, bBottom);
+	PdfWriter writer = null;
 		writer = PdfWriter.getInstance(doc, new FileOutputStream(file));
 		doc.open();
 

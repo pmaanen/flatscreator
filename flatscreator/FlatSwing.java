@@ -10,6 +10,12 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.FileOutputStream;
+import java.io.ObjectOutputStream;
+import java.io.FileInputStream;
+import java.io.ObjectInputStream;
+import java.io.Serializable;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -45,6 +51,7 @@ public class FlatSwing {
     private JMenuItem exitMenuItem = null;
     private JMenuItem saveMenuItem = null;
     private JMenuItem aboutMenuItem = null;
+    private JMenuItem loadMenuItem = null;
     private JDialog aboutDialog = null;
     private JPanel aboutContentPane = null;
     private JLabel aboutVersionLabel = null;
@@ -142,7 +149,7 @@ public class FlatSwing {
 						try {
 						    flats.add(new Flat(
 								       fnames[ii].getAbsolutePath(),
-								       doubleFlap.isSelected(), drawShadow.isSelected()));
+								       doubleFlap.isSelected(), autoSize.isSelected(), drawShadow.isSelected()));
 						} catch (IOException e1) {
 							JOptionPane.showMessageDialog(jFrame,
 										      "Error while reading "+fnames[ii].getName()+": "+e1.getMessage(), "Error",
@@ -166,6 +173,7 @@ public class FlatSwing {
 						text = new JTextField();
 						text.setAlignmentY(Component.TOP_ALIGNMENT);
 						text.setText("19");
+						text.setEnabled(!autoSize.isEnabled());
 						sizes.add(text);
 						flatPanel.add(text);
 						JSpinner spinner = new JSpinner();
@@ -313,25 +321,51 @@ public class FlatSwing {
 		return exportMenuItem;
 	}
 	/**
-	 * This method initializes the save button
+	 * This method initializes the load button
 	 * 
 	 * @return javax.swing.JMenuItem
 	 */
-	private JMenuItem getSaveMenuItem() {
-		if (saveMenuItem == null) {
-			saveMenuItem = new JMenuItem();
-			saveMenuItem.setText("Save...");
-			saveMenuItem.addActionListener(new ActionListener() {
-
-				@Override
-				public void actionPerformed(ActionEvent e) {
+    private JMenuItem getLoadMenuItem() {
+	if (loadMenuItem == null) {
+	    loadMenuItem = new JMenuItem();
+	    loadMenuItem.setText("Load...");
+	    loadMenuItem.addActionListener(new ActionListener() {
+		    @Override
+			public void actionPerformed(ActionEvent e) {
+			FileDialog file = new FileDialog(jFrame, "", FileDialog.LOAD);
+			file.setFile("*.flat");
+			file.setMultipleMode(true);
+			file.setVisible(true);
+			File[] fnames=file.getFiles();
+			if (fnames.length!=0) {
+			    for (File filename : fnames){
+				readSheet(filename.getPath());
+			    }
+			}
+		    }});
+	}
+	return loadMenuItem;
+    }
+    /**                                                                                                                                                                                                                                                                                       
+     * This method initializes the save button                                                                                                                                                                                                                                                
+     *                                                                                                                                                                                                                                                                                        
+     * @return javax.swing.JMenuItem                                                                                                                                                                                                                                                          
+     */
+    private JMenuItem getSaveMenuItem() {
+	    if (saveMenuItem == null) {
+		saveMenuItem = new JMenuItem();
+		saveMenuItem.setText("Save...");
+		saveMenuItem.addActionListener(new ActionListener() {
+			
+			@Override
+				    public void actionPerformed(ActionEvent e) {
 				    FileDialog file = new FileDialog(jFrame, "", FileDialog.SAVE);
 				    file.setFile("*.flat");
                                     file.setVisible(true);
                                     String fname = file.getDirectory() +
                                         System.getProperty("file.separator") + file.getFile();
 				    if (file.getFile()!=null) {
-						try {
+					try {
 							float bLeft = Float.parseFloat(left.getText().replace(
 									',', '.'));
 							float bRight = Float.parseFloat(right.getText().replace(
@@ -534,9 +568,9 @@ public class FlatSwing {
 					for (Flat f : flats) {
 						f.setAutoSize(autoSize.isSelected());
 					}
-					height.setEnabled(autoSize.isSelected());
+					height.setEnabled(!autoSize.isSelected());
 					    for(JTextField size : sizes){
-						size.setEnabled(autoSize.isSelected());
+						size.setEnabled(!autoSize.isSelected());
 					    }
 				}
 			    });
@@ -618,8 +652,9 @@ public class FlatSwing {
 			fileMenu.setText("File");
 			fileMenu.add(getNewMenuItem());
 			fileMenu.add(getExportMenuItem());
-			//Now implemented
-			//fileMenu.add(getSaveMenuItem());
+			//Not implemented
+			fileMenu.add(getLoadMenuItem());
+			fileMenu.add(getSaveMenuItem());
 			fileMenu.add(getExitMenuItem());
 		}
 		return fileMenu;
@@ -722,4 +757,49 @@ public class FlatSwing {
 		return aboutVersionLabel;
 	}
 
+    public void readSheet(String filename){
+	Sheet e = null;
+      try
+	  {
+	      FileInputStream fileIn = new FileInputStream(filename);
+	      ObjectInputStream in = new ObjectInputStream(fileIn);
+	      e =new Sheet( (Sheet) in.readObject() );
+	      in.close();
+	      fileIn.close();
+
+	      FileDialog file = new FileDialog(jFrame, "", FileDialog.SAVE);
+	      file.setFile("*.pdf");
+	      file.setVisible(true);
+	      String fname = file.getDirectory() +
+		  System.getProperty("file.separator") + file.getFile();
+	      if (file.getFile()!=null) {
+		  try {
+		      e.output(new File(fname));
+		  } catch (FileNotFoundException e1) {
+		      JOptionPane.showMessageDialog(jFrame,
+						    e1.getMessage(), "Error",
+						    JOptionPane.ERROR_MESSAGE);
+		  } catch (DocumentException e1) {
+		      JOptionPane.showMessageDialog(jFrame,
+						    e1.getMessage(), "Error",
+						    JOptionPane.ERROR_MESSAGE);
+		  } catch (NumberFormatException e1) {
+		      JOptionPane.showMessageDialog(jFrame,
+						    e1.getMessage(), "Error",
+						    JOptionPane.ERROR_MESSAGE);
+		  }
+	      }
+	  } catch(IOException i) {
+	  i.printStackTrace();
+	  return;
+      } catch(DocumentException d){
+	  d.printStackTrace();
+	  return;
+      } 
+      catch(ClassNotFoundException c){
+	  System.out.println("Sheet class not found");
+	  c.printStackTrace();
+	  return;
+      }
+    }
 }
