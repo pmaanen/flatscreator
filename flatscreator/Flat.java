@@ -61,7 +61,6 @@ public class Flat implements java.io.Serializable {
             width=imageWidth;
 	    height=imageHeight;
         }
-	System.out.printf(imagePath+" width: "+imageWidth+" height: "+imageHeight);   
 	FONT = BaseFont.createFont(BaseFont.HELVETICA, "Cp1252",false);
     }
     
